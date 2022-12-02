@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SD WIFI PRO SETTING</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/bootstrap.min.css">                                            <!-- https://getbootstrap.com/ -->
+        <script>
+            var timeWifiStatus=1;
+            function updateWifiStatus() {
+                var status = document.getElementById('status');
+
+                xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function () {
+                    var resp = xmlHttp.responseText;
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                        console.log("Get status response:");
+                        console.log(xmlHttp.responseText);
+                    
+                        if( resp.startsWith('WIFI:')) {
+                            if(resp.includes('Connecting')) {
+                                timeWifiStatus++;
+                                status.innerText = "Connecting ... " + timeWifiStatus + "/100";
+                                console.log("setTimeout"+ timeWifiStatus);
+                                setTimeout(updateWifiStatus,3000);
+                            } else {
+                                if(resp.includes('Connected')) {
+                                    status.innerText = resp.substr(resp.indexOf(':')+1);
+                                } else if(resp.includes('Failed')) {
+                                    status.innerText = "Connect failed.";
+                                }
+                                console.log("clear timer");
+                            }
+                        }
+                    }
+                };
+                try {
+                    xmlHttp.open('GET', '/wifistatus', true);
+                    xmlHttp.send(null);
+                } catch(error) {
+                    console.log("Get error response:" + error);
+                    setTimeout(updateWifiStatus,6000);
+                }
+            }
+
+            function onClickConnect() {
+                console.log("onClickConnect");
+
+                var ssid = document.getElementById('ssid').value;
+                if(ssid == '') {
+                    alert("SSID empty");
+                    return;
+                }
+
+                var password = document.getElementById('password').value;
+                if(password == '') {
+                    alert("Password empty");
+                    return;
+                }
+
+                var status = document.getElementById('status');
+                status.innerText = "Connecting, please wait ...";
+
+                xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function () {
+                    var resp = xmlHttp.responseText;
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                        console.log("Get connect response:");
+                        console.log(xmlHttp.responseText);
+                        if( resp.startsWith('WIFI:')) {
+                            if(resp.includes('Starting')) {
+                                // Start to connect wifi AP, need to check the wifi status.
+                                console.log("start update timer");
+                                setTimeout(updateWifiStatus,3000);
+                                // setTimeout(onClickConnect,3000);
+                            }
+                            else if(resp.includes('AlreadyCon')) {
+                                status.innerText = "Already connected to the " + ssid + ". IP address: " + resp.substr(resp.lastIndexOf(':')+1);
+                            }
+                            else {
+                                alert(resp);
+                            }
+                        }
+                    }
+                };
+                try {
+                    xmlHttp.open('POST', '/wificonnect?ssid=' + ssid + '&password=' + password, true);
+                    xmlHttp.send(null);
+                } catch(error) {
+                        console.log("Get error response0:" + error);
+                    }
+                }
+
+            function onHttpWifiList(response) {
+                console.log("onHttpWifiList");
+                
+                var status = document.getElementById('status');
+                var list = "";
+                try {
+                    list = JSON.parse(response);
+                }
+                catch(error) {
+                        console.log("Get error response:" + error);
+                        var status = document.getElementById('status');
+                        status.innerText = "Response error, please Scan again.";
+                    }
+                var listS = "";
+                for (var i = 0; i < list.length; i++) {
+                    // console.log(list[i].ssid);
+                    // console.log(list[i].rssi);
+                    // console.log(list[i].type);
+                    listS += "SSID:" + list[i].ssid + " , RSSI" + list[i].rssi + " , Type:" + list[i].type + "\n";
+                }
+                
+                status.innerText = listS;
+            }
+
+            function getWifiList() {
+                xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function () {
+                    var resp = xmlHttp.responseText;
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                        onHttpWifiList(xmlHttp.responseText);
+                        console.log("Get response : ");
+                        console.log(xmlHttp.responseText);
+                    }
+                };
+                xmlHttp.open('GET', '/wifilist', true);
+                xmlHttp.send(null);
+            }
+
+            function onClickScan() {
+                // xmlHttp = new XMLHttpRequest(path);
+                // xmlHttp.open('HTTP_GET', '/wifiscan', true);
+                // xmlHttp.send(null);
+                console.log("onClickScan");
+                var status = document.getElementById('status');
+                status.innerText = "Scanning, please wait ...";
+
+                xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function () {
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                        console.log("Get response : ");
+                        console.log(xmlHttp.responseText);
+                        setTimeout(getWifiList,3000);
+                    }
+                };
+                xmlHttp.open('GET', '/wifiscan', true);
+                xmlHttp.send(null);
+            }
+            
+            function onClickAPMode() {
+                var status = document.getElementById('status');
+                status.innerText = "Start AP:SD-WIFI-PRO, IP: 192.168.4.1";
+                console.log("onClickAPMode");
+                xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function () {
+                    var resp = xmlHttp.responseText;
+                    if (xmlHttp.readyState == 4) {
+                        if( resp.startsWith('WIFI:')) {
+                            if(resp.includes('AlreadyAPmode')) {
+                                status.innerText = "AP:SD-WIFI-PRO already started, IP: 192.168.4.1";
+                            }
+                        }
+                        console.log(resp);
+                    }
+                }
+                xmlHttp.open('POST', '/wifiap', true);
+                xmlHttp.send(null);
+            }
+
+        </script>
+    </head>
+    
+    <style type="text/css">
+        .input input{height: 30px;width: 200px;}
+        .btn{width: 236px; height: 35px; background-color: #689bd0; border:0px; color:#ffffff;  margin-left:0px; margin-bottom:5px;} 
+    </style>
+    
+    <body>
+        <center>
+        <form class="form-horizontal" role="form">
+            <br>
+            <label class="input" margin-top:100px;>
+                <span>SSID</span>
+                <input id="ssid" type="text" name="ssid">
+            </label>
+            <br>
+            <label class="input">
+                <span>PASS</span> 
+                <input id="password" type="text"  name="password">
+            </label>
+            <br>
+            <input class="btn" type="button" value="Connect" onclick=javascript:onClickConnect() />
+            <br>
+            <input class="btn" type="button" value="Go to AP mode" onclick=javascript:onClickAPMode() />
+            <br>
+            <input class="btn" type="button" value="Scan" onclick=javascript:onClickScan() />
+            <br>
+            <span id="status"></span>
+        </form>
+        </center>
+
+    </body>
+</html>

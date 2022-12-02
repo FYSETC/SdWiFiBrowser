@@ -1,0 +1,105 @@
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<head>
+    <!-- <base href="<%=basePath%>"> -->
+
+    <title>My JSP 'table.jsp' starting page</title>
+    <!-- <meta http-equiv="pragma" content="no-cache">
+    
+    <meta http-equiv="cache-control" content="no-cache">
+    
+    <meta http-equiv="expires" content="0">
+    
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    
+    <meta http-equiv="description" content="This is my page"> -->
+    
+    <!--
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    -->
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" href="styles.css">
+    <script src="js/jquery-3.2.1.slim.min.js" type="text/javascript"></script>
+    <script src="js/bootstrap.min.js" type="text/javascript"></script>
+    <script>
+
+        function jump(){
+            alert("Hello world!");
+        window.location.href="http://www.baidu.com/";
+        
+        }
+
+        function creatChart(){
+            console.log("abc");
+            var data = 5;
+            createTable(".container", data);
+        }
+    
+        // $(document).ready(function () {
+        //     var data = 5;
+        //     createTable(".container", data);
+        // });
+    
+        function createTable(div, data) {
+            var $table = $('<table class="table table-hover table-striped table-bordered"></table>');
+            $("div").append($table);
+            var $caption = $('<caption style="text-align:center;">jquery生成bootstrap表格</caption>');
+            $table.append($caption);
+            var $thead = $('<thead></thead>');
+            var $trs = $('<tr></tr>');
+            var $th1 = $('<th>姓名</th>');
+            var $th2 = $('<th>年龄</th>');
+            var $th3 = $('<th>性别</th>');
+            $trs.append($th1);
+            $trs.append($th2);
+            $trs.append($th3);
+            $thead.append($trs);
+            $table.append($thead);
+            for (var i = 0; i < 10; i++) {
+                var $tr = $('<tr class="tr_content"></tr>');
+                $table.append($tr);
+                var $td1 = $('<td class="td_content1" "+i+" >张三' + i + '</td>');
+                $tr.append($td1);
+                var $td2 = $('<td class="td_content2">2' + i + '</td>');
+                $tr.append($td2);
+                var $td3 = $('<td class="td_content3">3' + i + '</td>');
+                $tr.append($td3);
+                $tr.on("click", ".td_content1", function () {
+                    // var item = document.getElementById('aas');
+                    var item = document.getElementsByClassName('td_content1');
+                    console.log(item);
+                });
+    
+            }
+    
+            for (var i = 0; i < data; i++) {
+                create_tbody();
+            }
+            $thead = $('</table>');
+        }
+    
+        function create_tbody() {
+    
+        }
+    </script>
+    <style>
+        tr:hover {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="button" value="点击" onclick=javascrtpt:creatChart() />
+    <a href="http://www.baidu.com/"><input type="button" value='百度'></a>
+    <input type="button" value="百度2" onclick=javascrtpt:jump() />
+    <div class="container"></div>
+
+</body>
+
+
+
+</html>
