@@ -66,12 +66,6 @@ int Config::loadFS() {
 unsigned char Config::load(FS* fs) {
   _fs = fs;
 
-  // Try to get the config from ini file
-  if(0 == loadFS())
-  {
-    return 1; // Return as connected before
-  }
-
   SERIAL_ECHOLN("Going to load config from EEPROM");
 
   EEPROM.begin(EEPROM_SIZE);
@@ -82,11 +76,18 @@ unsigned char Config::load(FS* fs) {
   }
   EEPROM.commit();
 
-  if(data.flag)
+  if(data.flag) {
     SERIAL_ECHOLN("Going to use the old network config");
-  else
-    SERIAL_ECHOLN("We didn't connect the network before");
-  return data.flag;
+    return data.flag;
+  }
+
+  // Try to get the config from ini file
+  if(0 == loadFS())
+  {
+    return 1; // Return as connected before
+  }
+  
+  return 0;
 }
 
 char* Config::ssid() {
