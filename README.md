@@ -2,7 +2,7 @@ This is frimware of SD WIFI PRO(SWD)
 
 
 ### Flash Binary firmware to SWD
-    Binary firmware have put into "tools\fluidnc-v3.6.5-win64\wifi" directory.
+    Binary firmware have put into "tools\Flash\binary" directory.
 
     1.Let SWD and SWD dev board to work together
     Insert SWD into SWP dev board socket, let USB cable inset to USB Type-C 
