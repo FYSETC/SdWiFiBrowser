@@ -1,0 +1,14 @@
+## Installing FluidNC on your ESP32
+
+### Erasing the SWD  
+
+If  ESP32 already has other binary firmware on it,  You can get
+rid of that other binary firmware with:
+
+    erase.bat
+
+### Flash binary ifrmware to SWD
+
+    install-all-8M.bat
+
+

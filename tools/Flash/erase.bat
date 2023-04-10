@@ -1,10 +1,5 @@
 @echo off
 
-call checksecurity.bat
-if not %ErrorLevel% equ 0 (
-   exit /b 1
-)
-
 set EsptoolPath=win64\esptool.exe
 
 set BaseArgs=--chip esp32 --baud 921600
